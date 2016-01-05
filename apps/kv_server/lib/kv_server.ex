@@ -35,15 +35,13 @@ defmodule KVServer do
 	end
 
 	defp serve(socket) do
-    import Pipe
+    
 
     msg =
+			with {:ok, data} <- read_line(socket),
+		    {:ok, command} <- KVServer.Command.parse(data),
+		    do: KVServer.Command.run(command)
 		
-      pipe_matching x, {:ok, x},
-        read_line(socket)
-        |> KVServer.Command.parse()
-        |> KVServer.Command.run()
-
     write_line(socket, msg)
     serve(socket)
 	end
